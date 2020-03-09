@@ -226,6 +226,37 @@ class UpdateScheduleTests(SharedModuleStoreTestCase):
         self.assert_schedule_dates(enrollment.schedule, course.start)  # start set to new course start
 
 
+@skip_unless_lms
+@override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
+class ResetScheduleTests(SharedModuleStoreTestCase):
+    ENABLED_SIGNALS = ['course_published']
+
+    def setUp(self):
+        super().setUp()
+
+        self.config = ScheduleConfigFactory(create_schedules=True)
+
+        site_patch = patch('openedx.core.djangoapps.schedules.signals.get_current_site', return_value=self.config.site)
+        self.addCleanup(site_patch.stop)
+        site_patch.start()
+
+        self.course = _create_course_run(self_paced=True)
+        self.enrollment = CourseEnrollmentFactory(
+            course_id=self.course.id,
+            mode=CourseMode.AUDIT,
+        )
+
+    def test_schedule_is_reset_after_enrollment_change(self):
+        """ Test that an update in enrollment causes a schedule reset. """
+        original_start = self.enrollment.schedule.start_date
+
+        # Upgrade to verified
+        CourseEnrollment.enroll(self.enrollment.user, self.course.id, mode=CourseMode.VERIFIED)
+
+        self.enrollment.schedule.refresh_from_db()
+        self.assertGreater(self.enrollment.schedule.start_date, original_start)
+
+
 def _create_course_run(self_paced=True, start_day_offset=-1):
     """ Create a new course run and course modes.
 

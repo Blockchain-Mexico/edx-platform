@@ -20,8 +20,10 @@ from lms.djangoapps.courseware.models import (
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_START_DATE_CHANGED
 from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from student.models import CourseEnrollment
+from student.signals import ENROLLMENT_TRACK_UPDATED
 from track import segment
 
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
@@ -76,6 +78,14 @@ def update_schedules_on_course_start_changed(sender, updated_course_overview, pr
             new_upgrade_deadline_str=date.serialize(upgrade_deadline),
         ),
     )
+
+
+@receiver(ENROLLMENT_TRACK_UPDATED)
+def reset_schedule_on_mode_change(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    When a CourseEnrollment's mode is changed, reset the user's schedule if self-paced.
+    """
+    reset_self_paced_schedule(user, course_key)
 
 
 def _calculate_upgrade_deadline(course_id, content_availability_date):

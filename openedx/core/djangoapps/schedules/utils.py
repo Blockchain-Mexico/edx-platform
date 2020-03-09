@@ -1,6 +1,11 @@
 
 
+import datetime
 import logging
+
+import pytz
+
+from openedx.core.djangoapps.schedules.models import Schedule
 
 LOG = logging.getLogger(__name__)
 
@@ -26,3 +31,17 @@ class PrefixedDebugLoggerMixin(object):
         Wrapper around LOG.info that prefixes the message.
         """
         LOG.info(self.log_prefix + ': ' + message, *args, **kwargs)
+
+
+def reset_self_paced_schedule(user, course_key):
+    """
+    Reset the user's schedule if self-paced, to the current time.
+
+    It does not create a new schedule, just resets an existing one.
+    This is used, for example, when a user requests it or when an enrollment mode changes.
+    """
+    Schedule.objects.filter(
+        enrollment__user=user,
+        enrollment__course__id=course_key,
+        enrollment__course__self_paced=True,
+    ).update(start_date=datetime.datetime.now(pytz.utc))

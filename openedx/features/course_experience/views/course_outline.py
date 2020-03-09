@@ -5,7 +5,6 @@ Views to show a course outline.
 
 import datetime
 import re
-import pytz
 import six
 
 from completion import waffle as completion_waffle
@@ -22,8 +21,8 @@ from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from student.models import CourseEnrollment
 from util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -168,11 +167,5 @@ def reset_course_deadlines(request, course_id):
     Set the start_date of a schedule to today, which in turn will adjust due dates for
     sequentials belonging to a self paced course
     """
-    course = CourseOverview.objects.get(id=course_id)
-    if course.self_paced:
-        enrollment = CourseEnrollment.objects.get(user=request.user, course=course_id)
-        schedule = enrollment.schedule
-        if schedule:
-            schedule.start_date = datetime.datetime.now(pytz.utc)
-            schedule.save()
+    reset_self_paced_schedule(request.user, course_id)
     return redirect(reverse('openedx.course_experience.course_home', args=[six.text_type(course_id)]))
