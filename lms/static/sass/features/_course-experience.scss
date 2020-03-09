@@ -412,69 +412,71 @@
 }
 
 // date summary
-.date-summary {
-  @include clearfix;
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
 
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  &:last-of-type {
-    padding-bottom: 0;
-  }
-
-  .left-column {
-    flex: 0 0 24px;
-
-    .calendar-icon {
-      margin-top: 4px;
-      height: 1em;
-      width: 16px;
-      background: url('#{$static-path}/images/calendar-alt-regular.svg');
-      background-repeat: no-repeat;
-    }
-  }
-
-  .right-column {
-    flex: auto;
-
-    .localized-datetime {
-      font-weight: $font-weight-bold;
-      margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    &:last-of-type {
+      padding-bottom: 0;
     }
 
-    .heading {
-      font: -apple-system-body;
-      line-height: 1.5;
-      font-weight: $font-bold;
-      color: theme-color("dark");
+    .left-column {
+      flex: 0 0 24px;
 
-      a {
-        font-weight: $font-semibold;
+      .calendar-icon {
+        margin-top: 4px;
+        height: 1em;
+        width: 16px;
+        background: url('#{$static-path}/images/calendar-alt-regular.svg');
+        background-repeat: no-repeat;
       }
     }
 
-    .description {
-      margin-bottom: 0;
-      display: inline-block;
-    }
+    .right-column {
+      flex: auto;
 
-    .heading, .description {
-      font-size: 0.9rem;
-    }
+      .localized-datetime {
+        font-weight: $font-weight-bold;
+        margin-bottom: 8px;
+      }
 
-    .date-summary-link {
-      font-weight: $font-semibold;
+      .heading {
+        font: -apple-system-body;
+        line-height: 1.5;
+        font-weight: $font-bold;
+        color: theme-color("dark");
 
-      a {
-        color: $link-color;
+        a {
+          font-weight: $font-semibold;
+        }
+      }
+
+      .description {
+        margin-bottom: 0;
+        display: inline-block;
+      }
+
+      .heading, .description {
         font-size: 0.9rem;
       }
-    }
-  }
 
-  .date {
-    color: theme-color("dark");
-    font: -apple-system-body;
+      .date-summary-link {
+        font-weight: $font-semibold;
+
+        a {
+          color: $link-color;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .date {
+      color: theme-color("dark");
+      font: -apple-system-body;
+    }
   }
 }
 
